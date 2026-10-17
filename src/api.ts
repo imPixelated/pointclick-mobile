@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "http://10.0.2.2:8080").replace(/\/$/, "");
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? "https://pointclick-backend-hrr4.onrender.com").replace(/\/$/, "");
 
 const K = { token: "pc_token", refresh: "pc_refresh", user: "pc_user" };
 
