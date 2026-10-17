@@ -1,5 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
+// Endereço do backend na nuvem (fixo, para o app instalado nunca depender de variável de ambiente)
 export const API_URL = "https://pointclick-backend-hrr4.onrender.com";
 
 const K = { token: "pc_token", refresh: "pc_refresh", user: "pc_user" };
@@ -43,15 +44,15 @@ async function refresh(): Promise<boolean> {
   return refreshing;
 }
 
-export async function api<T>(path: string, opts: { method?: string; body?: unknown; auth?: boolean; retry?: boolean } = {}): Promise<T> {
-  const { method = "GET", body, auth = true, retry = true } = opts;
+export async function api<T>(path: string, opts: { method?: string; body?: unknown; auth?: boolean; retry?: boolean; form?: FormData } = {}): Promise<T> {
+  const { method = "GET", body, auth = true, retry = true, form } = opts;
   const headers: Record<string, string> = { Accept: "application/json" };
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (auth) {
     const t = await SecureStore.getItemAsync(K.token);
     if (t) headers.Authorization = `Bearer ${t}`;
   }
-  const res = await fetch(`${API_URL}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+  const res = await fetch(`${API_URL}${path}`, { method, headers, body: form ?? (body === undefined ? undefined : JSON.stringify(body)) });
   if (res.status === 401 && auth && retry && (await refresh())) return api<T>(path, { ...opts, retry: false });
   if (!res.ok) {
     let msg = "Erro ao comunicar com a API";
